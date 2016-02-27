@@ -67,6 +67,8 @@ client.on('data',function(data){
 	// using egg data
 	if (data.eegPower != null){
 		//console.log(data.eegPower);
+		//console.log(data.eegPower.highalpha ?? ); // mentor said this is more useful
+		//idea is to get 3 dimension per sensor. (avg,speed,acceleration)
 	}
 
 
