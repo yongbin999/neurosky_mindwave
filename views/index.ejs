@@ -2,6 +2,7 @@
 <meta charset="utf-8" />
 <title>NeuroSky Mindwave Mobile - Node - WebSocket</title>
 <style>
+
 .hidden{display:none;}
 .tab-title{width:180px;}
 svg {
@@ -56,6 +57,19 @@ svg {
               <div class="content" id="panel3">
                 <input id="slider" type="range" min="0" max="1000" value="0" style="width:600px"/>
               </div>
+
+              <div class="content" id="panel4">
+                <p>Panel stay awake content goes here.</p>
+
+                <div id='graph-alertness2'></div>
+
+                <div id='graph-alertness3'></div>
+              </div>
+
+              <div class="content" id="panel5">
+                <p>Panel  draw content goes here.</p>
+              </div>
+
             </div>
             <div class="clearfix"></div>
         </div>
@@ -66,12 +80,13 @@ svg {
 <script type="text/javascript" src="js/foundation.min.js"></script>
 <script type="text/javascript" src="js/d3.js"></script>
 <script language="javascript" type="text/javascript">
-    
+    document.body.style.backgroundColor = 'yellow';    
     // global vars to store current data points
     var attention = 0;
     var meditation = 0;
     var blink = 0;
     var poorSignalLevel = 0;
+    var StayAwake = 0;
     
     // this is called by tick() below to retrieve whichever data is required at the moment
     // when connected, this function is called every 1/2 second (or whatever is specified in tick() )
@@ -85,6 +100,10 @@ svg {
                 break;
             case 'meditation':
                 return meditation;
+                break;
+
+            case 'StayAwake':
+                return attention;
                 break;
             // blink does its own thing with the slider, not used on the graph
             // but if we wanted to graph blinks, we'd put it here    
@@ -149,6 +168,7 @@ svg {
                 if(data.eSense){
                     attention = data.eSense.attention;
                     meditation = data.eSense.meditation;
+                    StayAwake = [attention,meditation];
                 }
                 
                 //console.log(currentData); // DEBUG
@@ -186,13 +206,13 @@ svg {
     // (since we won't have any data right off the bat, we start with some dummy data)
     // reference: 
     var n = 40,
-    random = d3.random.normal(0, .2),
+    random = d3.random.normal(0, 1),
     data = d3.range(n).map(random);
  
     // set dimensions of the graph, width, height, margins
     var margin = {top: 20, right: 20, bottom: 20, left: 40},
         width = 900 - margin.left - margin.right,
-        height = 300 - margin.top - margin.bottom;
+        height = 100 //300 - margin.top - margin.bottom;
 
     // setup x axis domain (0-39) and range
     var x = d3.scale.linear()
@@ -211,9 +231,70 @@ svg {
         .x(function(d, i) { return x(i); })
         .y(function(d, i) { return y(d); });
 
+
     // create an svg in <div> with id="graph-alertness"
     // set its width and height and margins
     // this will be the container of the graph
+
+    var svg3 = d3.select("#graph-alertness2").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+    svg3.append("defs").append("clipPath")
+        .attr("id", "clip")
+      .append("rect")
+        .attr("width", width)
+        .attr("height", height);
+
+    svg3.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + y(0) + ")")
+        .call(d3.svg.axis().scale(x).orient("bottom"));
+
+    svg3.append("g")
+        .attr("class", "y axis")
+        .call(d3.svg.axis().scale(y).orient("left"));
+
+    var path3 = svg3.append("g")
+        .attr("clip-path", "url(#clip)")
+      .append("path3")
+        .datum(data)
+        .attr("class", "line")
+        .attr("d", line);
+
+
+    var svg2 = d3.select("#graph-alertness2").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg2.append("defs").append("clipPath")
+        .attr("id", "clip")
+      .append("rect")
+        .attr("width", width)
+        .attr("height", height);
+
+    svg2.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + y(0) + ")")
+        .call(d3.svg.axis().scale(x).orient("bottom"));
+
+    svg2.append("g")
+        .attr("class", "y axis")
+        .call(d3.svg.axis().scale(y).orient("left"));
+
+    var path2 = svg2.append("g")
+        .attr("clip-path", "url(#clip)")
+      .append("path2")
+        .datum(data)
+        .attr("class", "line")
+        .attr("d", line);
+
+
     var svg = d3.select("#graph-alertness").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
@@ -259,7 +340,7 @@ svg {
           .ease("linear")
           .attr("transform", "translate(" + x(-1) + ",0)")
           .each("end", tick);
-
+          
       // pop the old data point off the front
       data.shift();
 
