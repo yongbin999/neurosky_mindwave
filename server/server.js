@@ -54,18 +54,19 @@ client.on('data',function(data){
 		var timelapse_blinked = (curtime- lastblinked).toFixed(1);
 		//console.log(timelapse_blinked);
 		var brain_activity = 100 - parseFloat(data.eSense['meditation']);
-		console.log(brain_activity);
+		//console.log(brain_activity);
 
 		if (brain_activity<10 && ( blink_lapse > 5 || timelapse_blinked>30) ){
 			console.log("wake uppppppppp!!!!!" );
-			console.log("| last blinked: " + timelapse_blinked + 
+			console.log("last blinked: " + timelapse_blinked + 
 						"| average blink lapse: "  + blink_lapse +
 						"| brain activity: " + brain_activity);
 		}
 	}
 
+	// using egg data
 	if (data.eegPower != null){
-		
+		//console.log(data.eegPower);
 	}
 
 
