@@ -1,0 +1,157 @@
+<html>
+  <head>
+    <style>
+      .chart{
+        width: 25%;
+        float: left;
+      }
+      .values{
+        width: 50%;
+        float: left;
+        text-align: center;
+      }
+      .values > div > div{
+        width: 45%;
+        float: left;
+        border-bottom: 1px solid #efefef;
+        border-left: 1px solid #efefef;
+        padding: 5px;
+        font-size: 20px;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src='http://code.highcharts.com/highcharts.js'></script>
+    <script src="./neuro.js"></script>
+
+    <script src="./server.js"></script>
+    <script>
+      $(function () {
+        $(document).ready(function () {
+          var socket = io();
+          var series, chart;
+          socket.on('mins', function(min){
+            var asString = "";
+            for(var props in min){
+              asString += '<div class=\'names\'>' + props + "</div><div class='amount'> " + min[props] + '</div>';
+            }
+            document.getElementById('mins').innerHTML = asString;
+          });
+
+          socket.on('maxs', function(max){
+            var asString = "";
+
+            for(var props in max){
+              asString += '<div class=\'names\'>' + props + "</div><div class='amount'> " + max[props] + '</div>';
+            }
+            document.getElementById('maxs').innerHTML = asString;
+          });
+
+          socket.on('series', function(val){
+            var x = (new Date()).getTime(); // current time
+            $('#theta').highcharts().series[0].addPoint([x, val.theta], true, true);
+            $('#loAlpha').highcharts().series[0].addPoint([x, val.loAlpha], true, true);
+            $('#hiAlpha').highcharts().series[0].addPoint([x, val.hiAlpha], true, true);
+            $('#loBeta').highcharts().series[0].addPoint([x, val.loBeta], true, true);
+            $('#hiBeta').highcharts().series[0].addPoint([x, val.hiBeta], true, true);
+            $('#loGamma').highcharts().series[0].addPoint([x, val.loGamma], true, true);
+            $('#midGamma').highcharts().series[0].addPoint([x, val.midGamma], true, true);
+          });
+          Highcharts.setOptions({
+            global: {
+              useUTC: false
+            }
+          });
+          makeChart('theta', 'red');
+          makeChart('loAlpha', 'green');
+          makeChart('hiAlpha', 'pink');
+          makeChart('loBeta', 'orange');
+          makeChart('hiBeta', 'blue');
+          makeChart('loGamma', 'black');
+          makeChart('midGamma', 'purple');
+        });
+      });
+
+      function makeChart(cont, color){
+        $('#' + cont).highcharts({
+          chart: {
+            height: '200',
+            type: 'spline',
+            animation: Highcharts.svg, // don't animate in old IE
+            marginRight: 10,
+          },
+          credits: {
+            enabled: false
+          },
+          plotOptions: {
+            spline: {
+              marker: {
+                enabled: false
+              }
+            }
+          },
+          title: {
+            text: cont
+          },
+          xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 150
+          },
+          yAxis: {
+            min: 0,
+            max: 16000000,
+            title: {
+              text: 'Value'
+            },
+          },
+          tooltip: {
+            enabled: false,
+          },
+          legend: {
+            enabled: true
+          },
+          exporting: {
+            enabled: false
+          },
+          series: [{
+            name: cont,
+            data: randomData(),
+            color: color
+          }]
+        });
+      }
+     function randomData() {
+        // generate an array of random data
+        var data = [],
+            time = (new Date()).getTime(),
+            i;
+
+        for (i = -19; i <= 0; i += 1) {
+          data.push({
+            x: time + i * 1000,
+            y: 10000000
+          });
+        }
+        return data;
+      }
+    </script>
+    <div class='values'>
+      <h1>Minimum Values</h1>
+      <div id='mins'></div>
+    </div>
+    <div class='values'>
+      <h1>Maximum Values</h1>
+      <div id='maxs'></div>
+    </div>
+    <hr>
+    <div id='theta' class='chart'></div>
+    <div id='loAlpha' class='chart'></div>
+    <div id='hiAlpha' class='chart'></div>
+    <div id='loBeta' class='chart'></div>
+    <div id='hiBeta' class='chart'></div>
+    <div id='loGamma' class='chart'></div>
+    <div id='midGamma' class='chart'></div>
+  </body>
+</html>
