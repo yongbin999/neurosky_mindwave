@@ -6,6 +6,10 @@ var client = neurosky.createClient({
 	appKey:'0fc4141b4b45c675cc8d3a765b8d71c5bde9390'
 })
 
+	var elapsetime = Date.now();
+	var blinkcapture ={};
+	var blinkcount = 0;
+
 // bind receive data event
 client.on('data',function(data){
 	// if websocket server is running
@@ -16,7 +20,22 @@ client.on('data',function(data){
 
 	if(data.blinkStrength){
 		console.log(data);
+		blinkcount +=1;
+		elapsetime -=Data.now();
+		blinkcapture +=(blinkcount,elapsetime);
+
+		console.log(blinkcapture);
 	}
+	
+	if (data.eSense){
+		console.log(data);
+	}
+
+	if (data.eegPower){
+		
+	}
+
+
 });
 // initiate connection
 client.connect();
