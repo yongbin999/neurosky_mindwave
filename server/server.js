@@ -12,7 +12,7 @@ var client = neurosky.createClient({
 
 	var lastblinked = Date.now()/1000;;
 
-console.log("wait 5 seconds, then blink 5 times to initialize stats");
+	console.log("wait 5 seconds, then blink 5 times to initialize stats");
 
 // bind receive data event
 client.on('data',function(data){
