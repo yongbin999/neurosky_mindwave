@@ -28,7 +28,30 @@ client.on('data',function(data){
 	}
 
 	//if not blink a long time and detecting high meditation, then you might be sleeping
-	if (data.eSense != null){
+
+
+
+
+	//The average person blinks some 15-20 times per minute, or every 3 second 
+	//if detect blinking get the time lapse of blinks
+	if(data.blinkStrength !=null){
+		lastblinked = Date.now()/1000;
+
+		var curtime = Date.now()/1000;
+		var elapsetime = (curtime- starttime).toFixed(1);
+		blinkcapture.push({'elapsetime':elapsetime});
+
+		var len = blinkcapture.length
+		if (len>5){
+			blink_lapse = ((parseFloat(blinkcapture[len-1]['elapsetime'])-parseFloat(blinkcapture[len-5]['elapsetime']))/5).toFixed(1);
+			console.log("avg sec/blink: " + blink_lapse);
+			blinkcapture = blinkcapture.slice(-5); // cut out old data
+		}
+
+
+	}
+	
+		if (data.eSense != null){
 
 		//console.log(data.eSense);
 		//console.log(data.eSense['meditation']);
@@ -39,34 +62,11 @@ client.on('data',function(data){
 		var timelapse_blinked = (curtime- lastblinked).toFixed(1);
 		//console.log(timelapse_blinked);
 		var brain_activity = 100 - parseFloat(data.eSense['meditation']);
-		//console.log(brain_activity);
+		console.log("brain activity: "+ brain_activity);
 
 
 
-
-	//The average person blinks some 15-20 times per minute, or every 3 second 
-	//if detect blinking get the time lapse of blinks
-	if(data.blinkStrength !=null){
-		//console.log(data);
-		lastblinked = Date.now()/1000;
-
-		var curtime = Date.now()/1000;
-		var elapsetime = (curtime- starttime).toFixed(1);
-		blinkcapture.push({'elapsetime':elapsetime});
-		//console.log(blinkcapture.slice(1).slice(-5));   // print last 5 second 
-
-		var len = blinkcapture.length
-		if (len>5){
-			blink_lapse = ((parseFloat(blinkcapture[len-1]['elapsetime'])-parseFloat(blinkcapture[len-5]['elapsetime']))/5).toFixed(1);
-			console.log("avg sec/blink: " + blink_lapse + "brain activity: " + brain_activity);
-			blinkcapture = blinkcapture.slice(-5); // cut out old data
-		}
-
-
-	}
-	
-
-		if ( brain_activity<50 && ( blink_lapse > 3 || timelapse_blinked>15) ){
+		if ( brain_activity<50 && ( blink_lapse > 5 || timelapse_blinked>15) ){
 			console.log("wake uppppppppp!!!!!" );
 			console.log("last blinked: " + timelapse_blinked + 
 						"| average blink lapse: "  + blink_lapse +
