@@ -2,14 +2,6 @@ var neurosky = require('node-neurosky');
 var WebSocketServer = require('ws').Server;
 
 
-
-var http = require('http');
-var express = require('express');
-var app = express();
-var server = http.createServer(app).listen(8080);
-var io = require('socket.io').listen(server);
-
-
 var client = neurosky.createClient({
 	appName:'NodeNeuroSky',
 	appKey:'ad'
@@ -35,6 +27,23 @@ client.on('data',function(data){
 		wss.broadcast(data);
 	}
 
+	//if not blink a long time and detecting high meditation, then you might be sleeping
+	if (data.eSense != null){
+
+		//console.log(data.eSense);
+		//console.log(data.eSense['meditation']);
+
+		//console.log(lastblinked);
+
+		var curtime = Date.now()/1000;
+		var timelapse_blinked = (curtime- lastblinked).toFixed(1);
+		//console.log(timelapse_blinked);
+		var brain_activity = 100 - parseFloat(data.eSense['meditation']);
+		//console.log(brain_activity);
+
+
+
+
 	//The average person blinks some 15-20 times per minute, or every 3 second 
 	//if detect blinking get the time lapse of blinks
 	if(data.blinkStrength !=null){
@@ -49,27 +58,15 @@ client.on('data',function(data){
 		var len = blinkcapture.length
 		if (len>5){
 			blink_lapse = ((parseFloat(blinkcapture[len-1]['elapsetime'])-parseFloat(blinkcapture[len-5]['elapsetime']))/5).toFixed(1);
-			console.log("avg sec/blink: " + blink_lapse);
+			console.log("avg sec/blink: " + blink_lapse + "brain activity: " + brain_activity);
 			blinkcapture = blinkcapture.slice(-5); // cut out old data
 		}
 
 
 	}
 	
-	//if not blink a long time and detecting high meditation, then you might be sleeping
-	if (data.eSense != null){
-		//console.log(data.eSense);
-		//console.log(data.eSense['meditation']);
 
-		//console.log(lastblinked);
-
-		var curtime = Date.now()/1000;
-		var timelapse_blinked = (curtime- lastblinked).toFixed(1);
-		//console.log(timelapse_blinked);
-		var brain_activity = 100 - parseFloat(data.eSense['meditation']);
-		//console.log(brain_activity);
-
-		if (true || brain_activity<50 && ( blink_lapse > 3 || timelapse_blinked>15) ){
+		if ( brain_activity<50 && ( blink_lapse > 3 || timelapse_blinked>15) ){
 			console.log("wake uppppppppp!!!!!" );
 			console.log("last blinked: " + timelapse_blinked + 
 						"| average blink lapse: "  + blink_lapse +
@@ -78,7 +75,7 @@ client.on('data',function(data){
 
 
 						var five = require("johnny-five"),
-						  board = new five.Board();
+						  board = new five.Board({repl:false});
 
 						  board.on("ready", function() {
 
@@ -157,6 +154,14 @@ client.on('data',function(data){
 						  });
 
 						});
+						
+						board.on("close", function () {
+						console.log('Board closed')
+						})
+
+						board.stop();
+
+
 
 
 
