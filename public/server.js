@@ -43,8 +43,8 @@ client.on('data',function(data){
 			
 		var curtime = Date.now()/1000;
 		var pretime = elapsetime;
-		var timelapse_blinked = (curtime- elapsetime).toFixed(1);
-		console.log("avg sec/blink: \t" + blink_lapse + "\t\t\t\tlast blinked: " +timelapse_blinked);
+		var timelapse_blinked = elapsetime;
+		console.log("avg sec/blink: \t" + blink_lapse ); //+ "\t\t\t\tlast blinked: " +timelapse_blinked);
 			blinkcapture = blinkcapture.slice(1).slice(-6); // cut out old data
 		}
 
@@ -76,8 +76,8 @@ client.on('data',function(data){
 		if (brain_activity<30 && ( blink_lapse > 3 || timelapse_blinked>10) ){
 			console.log("wake uppppppppp!!!!!" );
 			console.log("last blinked: " + timelapse_blinked + 
-						"| average blink lapse: "  + blink_lapse +
-						"| brain activity: " + brain_activity);
+						"| \taverage blink lapse: "  + blink_lapse +
+						"| \tbrain activity: " + brain_activity);
 
 
 
