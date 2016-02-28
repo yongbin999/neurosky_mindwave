@@ -43,7 +43,7 @@ client.on('data',function(data){
 			
 		var curtime = Date.now()/1000;
 		var pretime = elapsetime;
-		var timelapse_blinked = (curtime- elapsetime)toFixed(1);
+		var timelapse_blinked = (curtime- elapsetime).toFixed(1);
 		console.log("avg sec/blink: \t" + blink_lapse + "\t\t\t\tlast blinked: " +timelapse_blinked);
 			blinkcapture = blinkcapture.slice(1).slice(-6); // cut out old data
 		}
