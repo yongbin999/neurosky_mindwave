@@ -40,7 +40,11 @@ client.on('data',function(data){
 		var len = blinkcapture.length
 		if (len>5){
 			blink_lapse = ((parseFloat(blinkcapture[len-1]['elapsetime'])-parseFloat(blinkcapture[len-5]['elapsetime']))/5).toFixed(1);
-			console.log("avg sec/blink: \t" + blink_lapse);
+			
+		var curtime = Date.now()/1000;
+		var pretime = elapsetime;
+		var timelapse_blinked = (curtime- elapsetime)toFixed(1);
+		console.log("avg sec/blink: \t" + blink_lapse + "\t\t\t\tlast blinked: " +timelapse_blinked);
 			blinkcapture = blinkcapture.slice(1).slice(-6); // cut out old data
 		}
 
@@ -60,7 +64,7 @@ client.on('data',function(data){
 		var brain_activity = 100 - parseFloat(data.eSense['meditation']);
 		if (brain_activity !=100){
 
-		console.log("\t\t\tbrain activity:\t"+ brain_activity + "\tlast blinked: " +timelapse_blinked);
+		console.log("\t\t\tbrain activity:\t"+ brain_activity);
 		}
 		else{
 
